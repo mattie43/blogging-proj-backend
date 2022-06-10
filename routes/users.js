@@ -18,18 +18,33 @@ router.get("/:userId", async (req, res) => {
   }
 });
 
-//create new user
-router.post("/", (req, res) => {
-  const user = new User({
-    username: req.body.username,
-    password: req.body.password,
-  });
-  user
-    .save()
-    .then((data) => {
-      res.json(data);
-    })
-    .catch((err) => res.json(err));
+//create new user or login
+router.post("/", async (req, res) => {
+  if (req.body.type === "signup") {
+    const user = new User({
+      username: req.body.username,
+      password: req.body.password,
+    });
+    user
+      .save()
+      .then((data) => {
+        res.json(data);
+      })
+      .catch((err) => {
+        if (err.code === 11000) {
+          res.json({ message: "Username already taken." });
+        } else {
+          res.json({ message: "Server error." });
+        }
+      });
+  } else {
+    const user = await User.findOne({ username: req.body.username });
+    if (!user || user.password !== req.body.password) {
+      res.json({ message: "Invalid username or password." });
+    } else {
+      res.json(user);
+    }
+  }
 });
 
 module.exports = router;
