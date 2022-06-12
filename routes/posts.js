@@ -4,7 +4,7 @@ const Post = require("../models/Post");
 
 //get all posts
 router.get("/", async (req, res) => {
-  const posts = await Post.find();
+  const posts = await Post.find().populate("user");
   res.json(posts);
 });
 

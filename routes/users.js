@@ -38,7 +38,9 @@ router.post("/", async (req, res) => {
         }
       });
   } else {
-    const user = await User.findOne({ username: req.body.username });
+    const user = await User.findOne({ username: req.body.username }).select(
+      "+password"
+    );
     if (!user || user.password !== req.body.password) {
       res.json({ message: "Invalid username or password." });
     } else {
